@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import Accordion from "./Accordion";
-import Home from "./Home/Home";
+import Accordion from "./AccordionCmp";
+import Home from "../Home/Home";
 
 class Landing extends Component {
   constructor(props) {
@@ -62,7 +62,7 @@ class Landing extends Component {
   render() {
     return (
       <div>
-        <Home></Home>
+        {/* <Home></Home> */}
         {/* <dl className="accordion">
           {this.state.blocks.map((item) => (
             <Accordion

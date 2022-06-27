@@ -9,10 +9,12 @@
 # General
 --------------------------------------------------------------*/
 body {
-  font-family: "Open Sans", sans-serif;
+  font-family: "Gotham",Open Sans, sans-serif !important;
   color: #444444;
 }
-
+*{
+  font-family: "Gotham" !important;
+}
 a {
   color: #3498db;
   text-decoration: none;
@@ -296,7 +298,7 @@ h1, h2, h3, h4, h5, h6 {
 --------------------------------------------------------------*/
 #hero {
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
   margin-top: 15px;
 }
 #hero h1 {
@@ -333,7 +335,7 @@ h1, h2, h3, h4, h5, h6 {
 .hero{
   background: url(../../assets/img/hero-bg.png) top center no-repeat;
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
 
   background-size: cover;
 }
@@ -344,7 +346,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 @media (max-width: 991px) {
   #hero {
-    height: 100vh;
+    min-height: 100vh;
   }
   #hero .animated {
     -webkit-animation: none;

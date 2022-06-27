@@ -1,27 +1,45 @@
-import AOS from 'aos';
-import './App.css';
-import Landing from './Components/Accordion/Landing';
-
+import AOS from "aos";
+import "./App.css";
+import Landing from "./Components/Accordion/Landing";
+import {
+  Redirect,
+  Route,
+  Switch,
+  withRouter,
+  BrowserRouter,
+} from "react-router-dom";
+import routes from "../src/views";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 function App() {
   AOS.init();
   return (
     <div className="App">
-      {/* <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header> */}
-      
-      <Landing></Landing>
+      <ToastContainer
+        style={{
+          alignItems: "center",
+          fontSize: "small",
+          width: "auto",
+          maxHeight: "1em",
+        }}
+        position="top-right"
+        autoClose={4000}
+        hideProgressBar={true}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+      <BrowserRouter>
+        <Switch>
+          {routes.map((page, key) => (
+            <Route path={page.path} component={page.component} key={key} />
+          ))}
+          <Redirect to="/home" />
+        </Switch>
+      </BrowserRouter>
     </div>
   );
 }

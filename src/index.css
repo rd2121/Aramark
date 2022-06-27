@@ -99,7 +99,8 @@ html, body, #app {
   padding: 0 30px;
   border: solid 1px #eeeeee;
   border-top: 0;
-  background: #e8f4fc;
+  /* background: #e8f4fc; */
+  background: #EDEAF1;
 }
 .accordion .content p {
   padding: 30px 0;
