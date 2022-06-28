@@ -1,42 +1,30 @@
+import EnergySavingsLeafOutlinedIcon from "@mui/icons-material/EnergySavingsLeafOutlined";
+import LocalAtmIcon from "@mui/icons-material/LocalAtm";
+import Avatar from "@mui/material/Avatar";
 import React, { Component } from "react";
+import { Col, Row } from "react-bootstrap";
+import "../../assets/css/style.css";
 import aramarkLogo from "../../assets/img/aramarkLogo.png";
+import homePageImg from "../../assets/img/homePageImg.png";
+import QuotesIcon from "../../assets/svg/Quotes";
 import "../../assets/vendor/aos/aos.css";
-import "../../assets/vendor/bootstrap/css/bootstrap.min.css";
 import "../../assets/vendor/bootstrap-icons/bootstrap-icons.css";
+import "../../assets/vendor/bootstrap/css/bootstrap.min.css";
 import "../../assets/vendor/boxicons/css/boxicons.min.css";
 import "../../assets/vendor/glightbox/css/glightbox.min.css";
 import "../../assets/vendor/remixicon/remixicon.css";
 import "../../assets/vendor/swiper/swiper-bundle.min.css";
-import "../../assets/css/style.css";
-import QuotesIcon from "../../assets/svg/Quotes";
-import homePageImg from "../../assets/img/homePageImg.png";
-import Avatar from "@mui/material/Avatar";
-import TextField from "@mui/material/TextField";
-import Autocomplete from "@mui/material/Autocomplete";
-import Switch from "@mui/material/Switch";
 import AccordionCmp from "../Accordion/AccordionCmp";
-import { Button, Col, Row } from "react-bootstrap";
-import Accordion from "@mui/material/Accordion";
-import AccordionSummary from "@mui/material/AccordionSummary";
-import Fab from "@mui/material/Fab";
-import AccordionDetails from "@mui/material/AccordionDetails";
-import Typography from "@mui/material/Typography";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
-import LocalAtmIcon from "@mui/icons-material/LocalAtm";
-import Chip from "@mui/material/Chip";
-import FaceIcon from "@mui/icons-material/Face";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import Slider from "@mui/material/Slider";
-import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
-import Alert from "../Alert/Alert";
-import EnergySavingsLeafOutlinedIcon from "@mui/icons-material/EnergySavingsLeafOutlined";
-import "./Dashboard.css";
 import ClientDetailService from "../Accordion/ClientDetailService";
+import Alert from "../Alert/Alert";
+import "./Dashboard.css";
 
 class Dashboard extends Component {
+  accordianCmpntRef = [];
+
   constructor(props) {
     super(props);
+
     this.state = {
       navbarClass: "navbar",
       mobileNavToggle: "bi bi-list mobile-nav-toggle",
@@ -45,28 +33,28 @@ class Dashboard extends Component {
         {
           id: 1,
           title: "Who is the client?",
-          body: null,
+          data: null,
           expanded: false,
           backgroundColor: "#808080",
         },
         {
           id: 2,
           title: "What is important to them?",
-          body: "Form 2",
-          expanded: true,
+          data: null,
+          expanded: false,
           backgroundColor: "#000080",
         },
         {
           id: 3,
           title: "How do they envision the dining experience?",
-          body: "Form 3",
+          data: null,
           expanded: false,
           backgroundColor: "#A93226",
         },
         {
           id: 4,
           title: "What additional services will best support this experience?",
-          body: "Form 4",
+          data: null,
           expanded: false,
           backgroundColor: "#16A085",
         },
@@ -148,10 +136,11 @@ class Dashboard extends Component {
       ],
       userSelectedIndustryType: [],
       userSelectedThemes: [],
-      isLifeworks: false,
-      contractType: null,
-      clientName: "",
-      expanded: "",
+      // isLifeworks: false,
+      // contractType: null,
+      // clientName: "",
+      // expanded: "",
+      formData: null,
       step1Data: null,
       step2Data: null,
       step3Data: null,
@@ -176,124 +165,115 @@ class Dashboard extends Component {
     }
   }
 
-  // toggle(id, data) {
-  //   this.setState((prevState, props) => {
-  //     const index = prevState.blocks.findIndex((item) => item.id === id);
+  toggle(id) {
+    this.setState((prevState, props) => {
+      const index = prevState.steps.findIndex((item) => item.id === id);
 
-  //     prevState.blocks[index].expanded = !prevState.blocks[index].expanded;
+      prevState.steps[index].expanded = !prevState.steps[index].expanded;
 
-  //     return { blocks: prevState.blocks };
-  //   });
-  // }
+      return { steps: prevState.steps };
+    });
+  }
 
-  // nextAccoordianOpen(id, data) {
-  //   this.setState((prevState, props) => {
-  //     const index = prevState.blocks.findIndex((item) => item.id === id);
-  //     prevState.blocks[index].expanded = !prevState.blocks[index].expanded;
-  //     prevState.blocks[index + 1].expanded =
-  //       !prevState.blocks[index + 1].expanded;
+  nextAccoordianOpen(id) {
+    console.log("id ", id);
+    this.setState((prevState, props) => {
+      const index = prevState.steps.findIndex((item) => item.id === id);
+      console.log("index ", index);
+      prevState.steps[index].expanded = !prevState.steps[index].expanded;
+      prevState.steps[index + 1].expanded =
+        !prevState.steps[index + 1].expanded;
 
-  //     return { blocks: prevState.blocks };
-  //   });
-  // }
+      return { steps: prevState.steps };
+    });
+  }
   valuetext(value) {
     return `${value}`;
   }
-  handleInputNameChange(e) {
-    this.setState({
-      clientName: e.target.value,
-    });
-  }
 
-  handleContractTypeChange(contractType) {
-    this.state.contractType = contractType;
-    this.setState({
-      contractType: contractType,
-    });
-    if (undefined !== this.state.onChange && null !== this.state.onChange) {
-      this.state.onChange(this.state);
-    }
-  }
-  handleLifeworksChange(e) {
-    this.setState({
-      isLifeworks: e.target.checked,
-    });
-  }
+  createClient(id) {
+    for (let i = 0; i < this.accordianCmpntRef.length; i++) {
+      if (i === id) {
+        if (
+          this.accordianCmpntRef[i].current.state.clientName === "" ||
+          this.accordianCmpntRef[i].current.state.clientName.length > 255
+        ) {
+          Alert.error("Enter client name,0-255 characters");
+          document.getElementById("clientName").focus();
+        } else if (
+          this.accordianCmpntRef[i].current.state.contractType === null
+        ) {
+          Alert.error("Choose a contract type");
+          document.getElementById("contractType").focus();
+        } else if (
+          this.accordianCmpntRef[i].current.state.anticipatedRevenue === 0
+        ) {
+          Alert.error("Select the anticipated revenue");
+          document.getElementById("AnticipatedRevenue").focus();
+        } else if (this.accordianCmpntRef[i].current.state.population === 0) {
+          Alert.error("Estimate the population");
+          document.getElementById("Population").focus();
+        } else if (
+          this.accordianCmpntRef[i].current.state.userSelectedIndustryType
+            .length === 0
+        ) {
+          Alert.error("Select at least one industry type");
 
-  handleAnticipatedRevenueChange = (e, data) => {
-    this.setState({
-      anticipatedRevenue: data,
-    });
-  };
-  handlePopulationChange = (e, data) => {
-    this.setState({
-      population: data,
-    });
-  };
-
-  createClient() {
-    console.log(this.state.clientName.length);
-    if (this.state.clientName === "" || this.state.clientName.length > 255) {
-      Alert.error("Enter client name,0-255 characters");
-      document.getElementById("clientName").focus();
-    } else if (this.state.contractType === null) {
-      Alert.error("Choose a contract type");
-      document.getElementById("contractType").focus();
-    }
-    // else if (this.state.isLifeworks === false) {
-    //   Alert.error("Lifeworks is should be true");
-    //   document.getElementById("Lifeworks").focus();
-    // }
-    else if (this.state.anticipatedRevenue === 0) {
-      Alert.error("Select the anticipated revenue");
-      document.getElementById("AnticipatedRevenue").focus();
-    } else if (this.state.population === 0) {
-      Alert.error("Estimate the population");
-      document.getElementById("Population").focus();
-    } else if (this.state.userSelectedIndustryType.length === 0) {
-      Alert.error("Select at least one industry type");
-
-      for (let i = 0; i < this.state.industryTypes.length; i++) {
-        document.getElementById("industryBtn" + i).style.border =
-          "1px solid red";
+          for (
+            let i = 0;
+            i < this.accordianCmpntRef[i].current.state.industryTypes.length;
+            i++
+          ) {
+            document.getElementById("industryBtn" + i).style.border =
+              "1px solid red";
+          }
+        } else {
+          let obj = {
+            ClientName: this.accordianCmpntRef[i].current.state.clientName,
+            ContractType: this.accordianCmpntRef[i].current.state.contractType,
+            LifeWorks: this.accordianCmpntRef[i].current.state.isLifeworks,
+            AnticipatedRevenue:
+              this.accordianCmpntRef[i].current.state.anticipatedRevenue,
+            Population: this.accordianCmpntRef[i].current.state.population,
+            IndustrTypes:
+              this.accordianCmpntRef[i].current.state.userSelectedIndustryType,
+          };
+          // this.clientDetails.sendData(obj);
+          this.state.steps[i].data = {};
+          this.setState({});
+          this.nextAccoordianOpen(this.state.steps[i].id);
+        }
       }
-    } else {
-      let obj = {
-        ClientName: this.state.clientName,
-        ContractType: this.state.contractType,
-        LifeWorks: this.state.isLifeworks,
-        AnticipatedRevenue: this.state.anticipatedRevenue,
-        Population: this.state.population,
-        IndustrTypes: this.state.userSelectedIndustryType,
-      };
-      this.clientDetails.sendData(obj);
-      // this.props.history.push("/");
-      this.setState({
-        step1Data: {},
-      });
-      this.handleAccordianChange("step2");
     }
   }
-  addWinthemes() {
-    if (this.state.userSelectedThemes.length === 0) {
-      // Alert.error("Themes are required");
-      // document.getElementById("industry_Type").focus();
-      for (let i = 0; i < this.state.winThemesData.length; i++) {
-        document.getElementById("themesBtn" + i).style.border = "1px solid red";
+  addWinthemes(id) {
+    console.log(
+      "themes log ",
+      this.accordianCmpntRef[id].current.state.userSelectedThemes
+    );
+    for (let i = 0; i < this.accordianCmpntRef.length; i++) {
+      if (i === id) {
+        if (
+          this.accordianCmpntRef[i].current.state.userSelectedThemes.length ===
+          0
+        ) {
+          for (let i = 0; i < this.state.winThemesData.length; i++) {
+            document.getElementById("themesBtn" + i).style.border =
+              "1px solid red";
+          }
+          this.setState({
+            isThemesErrorMsg: true,
+          });
+        } else {
+          let inputObj = {
+            userSelectedThemes:
+              this.accordianCmpntRef[i].current.state.userSelectedThemes,
+          };
+          this.state.steps[i].data = {};
+          this.setState({});
+          this.nextAccoordianOpen(this.state.steps[i].id);
+        }
       }
-      this.setState({
-        isThemesErrorMsg: true,
-      });
-    } else {
-      let inputObj = {
-        userSelectedThemes: this.state.userSelectedThemes,
-      };
-
-      this.setState({
-        step2Data: {},
-        isThemesErrorMsg: false,
-      });
-      this.handleAccordianChange("step3");
     }
   }
   selectIndustry(e, industry, index) {
@@ -324,8 +304,6 @@ class Dashboard extends Component {
     const { checked } = e.target;
     let themes = this.state.userSelectedThemes;
     if (checked === true) {
-      // document.getElementById("themesBtn" + index).style.backgroundColor =
-      //   "#EB2035";
       document.getElementById("themesBtn" + index).style.backgroundColor =
         "#fff";
       document.getElementById("themesBtn" + index).style.border =
@@ -333,7 +311,6 @@ class Dashboard extends Component {
       document.getElementById("themesBtn" + index).style.border =
         "1px solid #000";
       document.getElementById("thmsLbl" + index).style.color = "#566573";
-      // document.getElementById("thmsLbl" + index).style.color = "#ffff";
 
       themes.push(theme);
       this.setState({
@@ -363,66 +340,34 @@ class Dashboard extends Component {
       expanded: panel,
     });
   }
+
   render() {
-    // let Accordions = []
+    let accordians = [];
 
-    let industryTypes = [];
-    this.state.industryTypes.forEach((industry, index) => {
-      industryTypes.push(
-        <Col md={3} style={{ marginBottom: "0.5em" }}>
-          <div className="">
-            <div className="cat action" id={"industryBtn" + index}>
-              <label>
-                <input
-                  type="checkbox"
-                  style={{
-                    background: "white",
-                    color: "black",
-                  }}
-                  defaultChecked={this.state.isIndustryType}
-                  name="checkedSacCode"
-                  onChange={(e) => this.selectIndustry(e, industry, index)}
-                />
-                {industry}
-              </label>
-            </div>
-          </div>
-        </Col>
+    this.state.steps.forEach((item, index) => {
+      this.accordianCmpntRef[index] = React.createRef();
+      console.log("expanded ", item.expanded);
+      accordians.push(
+        <Row className="rowSeprator ">
+          <AccordionCmp
+            key={item.id}
+            title={item.title}
+            isThemesErrorMsg={this.state.isThemesErrorMsg}
+            ref={this.accordianCmpntRef[index]}
+            body={item.body}
+            expand={item.expanded}
+            bgColor={item.backgroundColor}
+            themes={this.state.winThemesData}
+            formData={item.data}
+            id={item.id}
+            onAccordianChange={this.toggle.bind(this, item.id)}
+            onClientCreate={this.createClient.bind(this, index)}
+            onThemeSelected={this.addWinthemes.bind(this, index)}
+          />
+        </Row>
       );
     });
 
-    let winThemes = [];
-    this.state.winThemesData.forEach((theme, index) => {
-      winThemes.push(
-        <Col md={6} style={{ marginBottom: "0.5em" }}>
-          <div className="">
-            <div className="themes action" id={"themesBtn" + index}>
-              <label>
-                <input
-                  type="checkbox"
-                  style={{
-                    background: "white",
-                    color: "black",
-                    width: "100%",
-                  }}
-                  defaultChecked={this.state.theme}
-                  name="checkedSacCode"
-                  onChange={(e) => this.selectedThemes(e, theme.theme, index)}
-                />
-                <span style={{ display: "flex" }}>
-                  <span id={"themeIcon" + index}> {theme.icon}</span>
-                  &nbsp;{" "}
-                  <span className="themesLabel" id={"thmsLbl" + index}>
-                    {theme.theme}
-                  </span>
-                </span>
-              </label>
-            </div>
-          </div>
-        </Col>
-      );
-    });
-    const label = { inputProps: { "aria-label": "Switch demo" } };
     return (
       <div>
         <meta charSet="utf-8" />
@@ -462,329 +407,7 @@ class Dashboard extends Component {
           <div className="aramark_dashboard">
             <Row className="heroSection ">
               <Col md={6} style={{ margin: "5em 0 0 0" }}>
-                <Row className="rowSeprator ">
-                  <Accordion
-                    disabled={this.state.step1Data !== null ? true : false}
-                    expanded={this.state.expanded === "step1"}
-                    onChange={this.handleAccordianChange.bind(this, "step1")}
-                    className={
-                      this.state.step1Data !== null ? "step_completed" : ""
-                    }
-                  >
-                    <AccordionSummary
-                      flexDirection="row-reverse"
-                      expandIcon={
-                        this.state.step1Data !== null ? (
-                          <CheckCircleIcon className="icon_step_complete" />
-                        ) : this.state.expanded === "step1" ? (
-                          <RemoveCircleIcon />
-                        ) : (
-                          <AddCircleIcon />
-                        )
-                      }
-                      style={{ flexDirection: "row-reverse" }}
-                      aria-controls="panel1a-content"
-                      id="panel1a-header"
-                    >
-                      <Typography>Tell us about your prospect</Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      {/* <form onSubmit={this.createClient.bind(this)}> */}
-                      <Row md={12} className="rowSeprator">
-                        <Col md={12}>
-                          <TextField
-                            id="clientName"
-                            label="Name"
-                            variant="outlined"
-                            size="small"
-                            fullWidth
-                            value={this.state.clientName}
-                            onChange={this.handleInputNameChange.bind(this)}
-                          />
-                        </Col>
-                      </Row>
-                      <Row className="rowSeprator">
-                        <Col md={6} style={{ marginBottom: "1em" }}>
-                          {" "}
-                          <Autocomplete
-                            disablePortal
-                            id="contractType"
-                            options={this.state.contractTypes}
-                            sx={{ width: 300 }}
-                            value={this.state.contractType}
-                            getOptionLabel={(option) => option}
-                            onChange={(event, value) => {
-                              this.handleContractTypeChange(value);
-                            }}
-                            renderInput={(params) => (
-                              <TextField
-                                {...params}
-                                label="Select Contract Type"
-                                required
-                              />
-                            )}
-                          />
-                        </Col>
-                        <Col md={6}>
-                          <div className="toggle_switch_rounded_bg">
-                            <Switch
-                              {...label}
-                              id="Lifeworks"
-                              style={{ float: "left" }}
-                              checked={this.state.isLifeworks}
-                              onChange={this.handleLifeworksChange.bind(this)}
-                            />
-                            <span className="switchLabel"> Lifeworks?</span>
-                          </div>
-                        </Col>
-                      </Row>
-                      <Row className="rowSeprator">
-                        <Col md={6} style={{ marginBottom: "1em" }}>
-                          <div className="range_rounded_bg">
-                            &nbsp;
-                            <span className="switchLabel">
-                              {" "}
-                              Anticipated Revenue *{" "}
-                            </span>
-                            <Slider
-                              aria-label="Always visible"
-                              id="AnticipatedRevenue"
-                              onChange={this.handleAnticipatedRevenueChange}
-                              value={this.state.anticipatedRevenue}
-                              min={0}
-                              max={10}
-                              marks={this.state.marks1}
-                            />
-                          </div>
-                        </Col>
-                        <Col md={6}>
-                          <div className="range_rounded_bg">
-                            &nbsp;
-                            <span className="switchLabel"> Population *</span>
-                            <Slider
-                              aria-label="Always visible"
-                              id="Population"
-                              min={0}
-                              max={5000}
-                              onChange={this.handlePopulationChange}
-                              value={this.state.population}
-                              step={10}
-                              marks={this.state.marks2}
-                              valueLabelDisplay="on"
-                            />
-                          </div>
-                        </Col>
-                      </Row>
-                      <Row className="rowSeprator">
-                        <Col md={12}>
-                          <div
-                            className="Industry_type_rounded_bg"
-                            id="industry_Type"
-                          >
-                            <span className="switchLabel">
-                              {" "}
-                              Select Industry Type *
-                            </span>
-                            <br></br>
-                            <br></br>
-                            <div>
-                              <Row>{industryTypes}</Row>
-                            </div>
-                          </div>
-                        </Col>
-                      </Row>
-                      <Row className="rowSeprator">
-                        <Col md={12} style={{ textAlign: "center" }}>
-                          <Button
-                            variant="contained"
-                            size="small"
-                            type="submit"
-                            style={{
-                              background: "black",
-                              color: "white",
-                              fontSize: "0.65em",
-                              minWidth: "10%",
-                              borderRadius: "15px",
-                            }}
-                            onClick={this.createClient.bind(this)}
-                          >
-                            Next
-                          </Button>
-                          {/* <Fab
-                              variant="extended"
-                              size="small"
-                              color="primary"
-                              aria-label="add"
-
-                              // onClick={this.createClient.bind(this)}
-                            >
-                              Next
-                            </Fab> */}
-                        </Col>
-                      </Row>
-                      {/* </form> */}
-                    </AccordionDetails>
-                  </Accordion>
-                </Row>
-                <Row className="rowSeprator ">
-                  <Accordion
-                    disabled={this.state.step2Data !== null ? true : false}
-                    expanded={this.state.expanded === "step2"}
-                    onChange={this.handleAccordianChange.bind(this, "step2")}
-                    className={
-                      this.state.step1Data !== null &&
-                      this.state.expanded !== "step2"
-                        ? "step_completed"
-                        : ""
-                    }
-                  >
-                    <AccordionSummary
-                      // expandIcon={
-                      //   this.state.step1Data !== null &&
-                      //   this.state.expanded !== "step2" ? (
-                      //     <CheckCircleIcon className="icon_step_complete" />
-                      //   ) : (
-                      //     <ExpandMoreIcon />
-                      //   )
-                      // }
-                      expandIcon={
-                        this.state.step2Data !== null ? (
-                          <CheckCircleIcon className="icon_step_complete" />
-                        ) : this.state.expanded === "step2" ? (
-                          <RemoveCircleIcon />
-                        ) : (
-                          <AddCircleIcon />
-                        )
-                      }
-                      style={{ flexDirection: "row-reverse" }}
-                      aria-controls="panel1a-content"
-                      id="panel1a-header"
-                    >
-                      <Typography>What is important to them?</Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Row style={{ textAlign: "left" }}>
-                        <span className="switchLabel">WIN THEMES</span>
-                        {this.state.isThemesErrorMsg === true ? (
-                          <span
-                            className="switchLabel"
-                            style={{ color: "red", fontWeight: "bold" }}
-                          >
-                            *Choose at least 1 win theme.
-                          </span>
-                        ) : (
-                          ""
-                        )}
-                      </Row>
-
-                      <Row className="rowSeprator ">{winThemes}</Row>
-                      <Row className="rowSeprator">
-                        <Col md={12} style={{ textAlign: "center" }}>
-                          <Fab
-                            variant="extended"
-                            size="small"
-                            color="primary"
-                            aria-label="add"
-                            style={{
-                              background: "black",
-                              color: "white",
-                              width: "10em",
-                            }}
-                            onClick={this.addWinthemes.bind(this)}
-                          >
-                            Next
-                          </Fab>
-                        </Col>
-                      </Row>
-                    </AccordionDetails>
-                  </Accordion>
-                </Row>
-                <Row className="rowSeprator ">
-                  <Accordion
-                    disabled={this.state.step3Data !== null ? true : false}
-                    expanded={this.state.expanded === "step3"}
-                    onChange={this.handleAccordianChange.bind(this, "step3")}
-                    className={
-                      this.state.step3Data !== null &&
-                      this.state.expanded !== "step3"
-                        ? "step_completed"
-                        : ""
-                    }
-                  >
-                    <AccordionSummary
-                      expandIcon={
-                        this.state.step3Data !== null ? (
-                          <CheckCircleIcon className="icon_step_complete" />
-                        ) : this.state.expanded === "step3" ? (
-                          <RemoveCircleIcon />
-                        ) : (
-                          <AddCircleIcon />
-                        )
-                      }
-                      // expandIcon={
-                      //   this.state.step3Data !== null &&
-                      //   this.state.expanded !== "step3" ? (
-                      //     <CheckCircleIcon className="icon_step_complete" />
-                      //   ) : (
-                      //     <ExpandMoreIcon />
-                      //   )
-                      // }
-                      style={{ flexDirection: "row-reverse" }}
-                      aria-controls="panel1a-content"
-                      id="panel1a-header"
-                    >
-                      <Typography>
-                        How do they envision the dining experience?
-                      </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails></AccordionDetails>
-                  </Accordion>
-                </Row>
-                <Row className="rowSeprator ">
-                  <Accordion
-                    disabled={this.state.step4Data !== null ? true : false}
-                    expanded={this.state.expanded === "step4"}
-                    onChange={this.handleAccordianChange.bind(this, "step4")}
-                  >
-                    <AccordionSummary
-                      expandIcon={
-                        this.state.step4Data !== null ? (
-                          <CheckCircleIcon className="icon_step_complete" />
-                        ) : this.state.expanded === "step4" ? (
-                          <RemoveCircleIcon />
-                        ) : (
-                          <AddCircleIcon />
-                        )
-                      }
-                      style={{ flexDirection: "row-reverse" }}
-                      aria-controls="panel1a-content"
-                      id="panel1a-header"
-                    >
-                      <Typography>
-                        What additional services will best support this
-                        experience?
-                      </Typography>
-                    </AccordionSummary>
-                    <AccordionDetails></AccordionDetails>
-                  </Accordion>
-                </Row>
-                {/* <Row className="rowSeprator ">
-                  {this.state.steps.map((item) => (
-                    <Row className="rowSeprator ">
-                      <AccordionCmp
-                        key={item.id}
-                        title={item.title}
-                        body={item.body}
-                        expand={item.expanded}
-                        bgColor={item.backgroundColor}
-                        themes={this.state.winThemesData}
-                        id={item.id}
-                        //  onClick={this.toggle.bind(this, item.id)}
-                        //  onSubmit={this.nextAccoordianOpen.bind(this, item.id)}
-                      />
-                    </Row>
-                  ))}
-                </Row> */}
+                {accordians}
               </Col>
               <Col md={6}>
                 <div className="" data-aos="fade-left" data-aos-delay={200}>

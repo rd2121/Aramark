@@ -352,3 +352,8 @@ font-size: 1.2em;
 .aramark_dashboard .css-viou3o-MuiAutocomplete-root {
     width: 100% !important;
 }
+.aramark_dashboard .step_edit{
+    color: #000;
+        border-left: 11px solid #4BAE4F;
+        background: #EDEAF1 !important;
+}
